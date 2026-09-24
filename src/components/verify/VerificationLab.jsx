@@ -25,6 +25,7 @@ import ExtractedJsonViewer from './ExtractedJsonViewer';
 import RiskScoreGauge from './RiskScoreGauge';
 import MLRiskAssessmentCard from './MLRiskAssessmentCard';
 import { THRESHOLD_QUALIFIED, formatINR, normalizeBidRecord } from '../../utils/formatters';
+import { API_BASE_URL } from '../../config/api';
 
 export default function VerificationLab({ 
   onDossierVerified, 
@@ -150,7 +151,7 @@ export default function VerificationLab({
     try {
       setTimeout(() => setCurrentStep(2), 250);
 
-      const response = await fetch('http://127.0.0.1:8000/api/bids/submit', {
+      const response = await fetch(`${API_BASE_URL}/api/bids/submit`, {
         method: 'POST',
         headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
         body: formData,

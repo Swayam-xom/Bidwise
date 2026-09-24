@@ -13,6 +13,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { normalizeBidRecord } from '../../utils/formatters';
+import { API_BASE_URL } from '../../config/api';
 
 export default function SubmitBidModal({ 
   isOpen, 
@@ -66,7 +67,7 @@ export default function SubmitBidModal({
     formData.append('file', selectedFile);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/bids/submit', {
+      const response = await fetch(`${API_BASE_URL}/api/bids/submit`, {
         method: 'POST',
         headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
         body: formData,

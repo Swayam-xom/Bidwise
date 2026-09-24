@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { formatINR } from '../../utils/formatters';
+import { API_BASE_URL } from '../../config/api';
 
 export default function AwardModal({ 
   isOpen, 
@@ -38,7 +39,7 @@ export default function AwardModal({
     setAwardResult(null);
     try {
       const tenderId = tender.id || 'GEM/2026/B/892101';
-      const response = await fetch(`http://127.0.0.1:8000/api/tenders/${encodeURIComponent(tenderId)}/award`, {
+      const response = await fetch(`${API_BASE_URL}/api/tenders/${encodeURIComponent(tenderId)}/award`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

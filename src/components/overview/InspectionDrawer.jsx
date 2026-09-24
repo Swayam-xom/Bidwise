@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { formatINR, getScoreColor, getStatusBadge } from '../../utils/formatters';
 import MLRiskAssessmentCard from '../verify/MLRiskAssessmentCard';
+import { API_BASE_URL } from '../../config/api';
 
 export default function InspectionDrawer({ 
   isOpen, 
@@ -48,7 +49,7 @@ export default function InspectionDrawer({
 
     if (bidder?.id) {
       setLoadingAudit(true);
-      fetch(`http://127.0.0.1:8000/api/bids/${bidder.id}/audit`, {
+      fetch(`${API_BASE_URL}/api/bids/${bidder.id}/audit`, {
         headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
       })
         .then(res => res.ok ? res.json() : null)
@@ -181,7 +182,7 @@ export default function InspectionDrawer({
     setActionError(null);
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/bids/${bidder.id}/status`, {
+      const res = await fetch(`${API_BASE_URL}/api/bids/${bidder.id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +202,7 @@ export default function InspectionDrawer({
       onUpdateBidderDecision(bidder.id, newStatus, remarks);
 
       // Refresh audit logs
-      const auditRes = await fetch(`http://127.0.0.1:8000/api/bids/${bidder.id}/audit`, {
+      const auditRes = await fetch(`${API_BASE_URL}/api/bids/${bidder.id}/audit`, {
         headers: jwtToken ? { Authorization: `Bearer ${jwtToken}` } : {},
       });
       if (auditRes.ok) {

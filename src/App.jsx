@@ -13,6 +13,7 @@ import MockRegistry from './components/registry/MockRegistry';
 import AnalyticsPage from './components/analytics/AnalyticsPage';
 import EngineSettings from './components/settings/EngineSettings';
 import LoginScreen from './components/auth/LoginScreen';
+import { API_BASE_URL } from './config/api';
 import { INITIAL_TENDER } from './data/mockData';
 import { normalizeBidRecord } from './utils/formatters';
 import { 
@@ -72,7 +73,7 @@ export default function App() {
   useEffect(() => {
     async function issueTenderToken() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/auth/token', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ tender_id: tender.id, role: 'procurement_officer' }),
@@ -93,11 +94,11 @@ export default function App() {
     issueTenderToken();
   }, [tender.id]);
 
-  // DYNAMIC TABLE FETCH ON MOUNT: GET http://127.0.0.1:8000/api/bids
+  // DYNAMIC TABLE FETCH ON MOUNT: GET /api/bids
   useEffect(() => {
     async function fetchBids() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/bids');
+        const res = await fetch(`${API_BASE_URL}/api/bids`);
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
@@ -112,7 +113,7 @@ export default function App() {
           }
         }
       } catch (err) {
-        console.info("Backend GET http://127.0.0.1:8000/api/bids is offline, initializing default dataset.", err);
+        console.info(`Backend GET ${API_BASE_URL}/api/bids is offline, initializing default dataset.`, err);
       }
     }
 
