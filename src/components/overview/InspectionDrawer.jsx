@@ -381,18 +381,18 @@ export default function InspectionDrawer({
                           {item.status === 'WARNING' && <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />}
                           <span>{item.title}</span>
                         </div>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border ${
                           item.status === 'PASS' 
-                            ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' 
+                            ? 'bg-[#DDF7EE] text-[#087F5B] border-[#8ED8C1] dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' 
                             : item.status === 'WARNING'
-                            ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                            : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                            ? 'bg-[#FFF4DB] text-[#B45309] border-[#F2C46D] dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
+                            : 'bg-[#FDE7EA] text-[#B4233D] border-[#F1A3AE] dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800'
                         }`}>
                           {item.status}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">{item.desc}</p>
-                      <div className="text-xs font-mono p-2 rounded bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">
+                      <div className="text-xs font-mono p-2 rounded bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
                         {item.detail}
                       </div>
                     </div>
@@ -472,10 +472,10 @@ export default function InspectionDrawer({
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                               rec.status === 'PASS' 
-                                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' 
-                                : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800'
+                                ? 'bg-[#DDF7EE] text-[#087F5B] border-[#8ED8C1] dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800' 
+                                : 'bg-[#FDE7EA] text-[#B4233D] border-[#F1A3AE] dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800'
                             }`}>
                               {rec.status}
                             </span>
@@ -520,7 +520,7 @@ export default function InspectionDrawer({
                         key={idx} 
                         className="p-3.5 bg-slate-50 dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 text-xs flex items-start gap-3"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                        <div className="w-8 h-8 rounded-lg bg-[#DDF7EE] dark:bg-emerald-950/60 text-[#087F5B] dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 border border-[#8ED8C1] dark:border-emerald-800">
                           <UserCheck className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -536,7 +536,7 @@ export default function InspectionDrawer({
                                 {item.old_status || 'Ingested'}
                               </span>
                               <span>→</span>
-                              <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.2 rounded text-[10px]">
+                              <span className="font-bold text-[#087F5B] dark:text-emerald-400 bg-[#DDF7EE] dark:bg-emerald-950/40 px-1.5 py-0.2 rounded text-[10px] border border-[#8ED8C1] dark:border-emerald-800">
                                 {item.new_status}
                               </span>
                             </div>
@@ -549,7 +549,7 @@ export default function InspectionDrawer({
                           )}
 
                           {item.actor && (
-                            <div className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-1">
+                            <div className="text-[11px] text-[#087F5B] dark:text-emerald-400 font-semibold mt-1">
                               Recorded by: {item.actor}
                             </div>
                           )}
@@ -586,7 +586,7 @@ export default function InspectionDrawer({
             <button
               onClick={() => handleDecision('Disqualified')}
               disabled={isSubmitting}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-300 dark:border-rose-800 font-bold text-xs shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-white dark:bg-slate-800 hover:bg-[#FDE7EA] dark:hover:bg-rose-950/40 text-[#B4233D] dark:text-rose-400 border border-[#F1A3AE] dark:border-rose-800 font-bold text-xs shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
             >
               <XCircle className="w-4 h-4" />
               <span>Reject Bidder</span>
@@ -595,7 +595,7 @@ export default function InspectionDrawer({
             <button
               onClick={() => handleDecision('Qualified')}
               disabled={isSubmitting}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-[#008F6C] hover:bg-[#006B52] text-white font-bold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Approve Bidder</span>

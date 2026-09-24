@@ -88,24 +88,24 @@ export default function MLRiskAssessmentCard({
   const getLabelBadge = (lbl) => {
     switch (lbl) {
       case 'Compliant':
-        return { bg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400', icon: CheckCircle2 };
+        return { bg: 'bg-[#DDF7EE] dark:bg-emerald-950/50 border-[#8ED8C1] dark:border-emerald-800 text-[#087F5B] dark:text-emerald-300', icon: CheckCircle2 };
       case 'Needs Review':
-        return { bg: 'bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400', icon: AlertTriangle };
+        return { bg: 'bg-[#FFF4DB] dark:bg-amber-950/50 border-[#F2C46D] dark:border-amber-800 text-[#B45309] dark:text-amber-300', icon: AlertTriangle };
       case 'Non-Compliant':
       default:
-        return { bg: 'bg-rose-500/15 border-rose-500/30 text-rose-700 dark:text-rose-400', icon: XCircle };
+        return { bg: 'bg-[#FDE7EA] dark:bg-rose-950/50 border-[#F1A3AE] dark:border-rose-800 text-[#B4233D] dark:text-rose-300', icon: XCircle };
     }
   };
 
   const getRiskColor = (lvl) => {
     switch (lvl) {
       case 'LOW':
-        return 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800';
+        return 'text-[#087F5B] dark:text-emerald-400 bg-[#DDF7EE] dark:bg-emerald-950/40 border-[#8ED8C1] dark:border-emerald-800';
       case 'MEDIUM':
-        return 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800';
+        return 'text-[#B45309] dark:text-amber-400 bg-[#FFF4DB] dark:bg-amber-950/40 border-[#F2C46D] dark:border-amber-800';
       case 'HIGH':
       default:
-        return 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800';
+        return 'text-[#B4233D] dark:text-rose-400 bg-[#FDE7EA] dark:bg-rose-950/40 border-[#F1A3AE] dark:border-rose-800';
     }
   };
 
@@ -117,11 +117,11 @@ export default function MLRiskAssessmentCard({
   const getSourceBadge = (src) => {
     switch (src) {
       case 'DOCUMENT':
-        return 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+        return 'bg-[#EEF6FF] dark:bg-blue-950/60 text-[#1769AA] dark:text-blue-300 border-[#B8D8F8] dark:border-blue-800';
       case 'DERIVED':
         return 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800';
       case 'PLATFORM':
-        return 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+        return 'bg-[#DDF7EE] dark:bg-emerald-950/60 text-[#087F5B] dark:text-emerald-300 border-[#8ED8C1] dark:border-emerald-800';
       case 'MOCK_EXTERNAL':
         return 'bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800';
       case 'UNAVAILABLE':

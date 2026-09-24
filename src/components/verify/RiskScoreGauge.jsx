@@ -104,15 +104,15 @@ export default function RiskScoreGauge({
   const summary = getTruthfulSummary();
 
   return (
-    <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 flex flex-col h-full">
+    <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-[#D0D5DD] dark:border-slate-800 shadow-sm p-6 flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pb-4 border-b border-[#E4E7EC] dark:border-slate-800">
         <div>
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-sm font-bold text-[#101828] dark:text-slate-100 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-[#008F6C] dark:text-emerald-400" />
             <span>Compliance Score & Risk Assessment</span>
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-[#667085] dark:text-slate-400 mt-0.5">
             Rule engine deduction breakdown & ML risk assessment
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function RiskScoreGauge({
       </div>
 
       {/* Gauge & Score Summary */}
-      <div className="py-6 flex flex-col sm:flex-row items-center justify-center gap-8 border-b border-slate-100 dark:border-slate-800">
+      <div className="py-6 flex flex-col sm:flex-row items-center justify-center gap-8 border-b border-[#E4E7EC] dark:border-slate-800">
         {/* SVG Radial Gauge */}
         <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
@@ -142,7 +142,7 @@ export default function RiskScoreGauge({
               cx="80"
               cy="80"
               r={radius}
-              stroke={!hasScore ? '#94A3B8' : numericScore >= THRESHOLD_QUALIFIED ? '#10B981' : numericScore >= THRESHOLD_CLARIFICATION ? '#F59E0B' : '#EF4444'}
+              stroke={!hasScore ? '#98A2B3' : numericScore >= THRESHOLD_QUALIFIED ? '#008F6C' : numericScore >= THRESHOLD_CLARIFICATION ? '#B45309' : '#B4233D'}
               strokeWidth="12"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
@@ -154,10 +154,10 @@ export default function RiskScoreGauge({
 
           {/* Center Score Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <span className="text-3xl font-extrabold text-[#101828] dark:text-white tracking-tight">
               {hasScore ? score : "—"}
             </span>
-            <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-[#667085] dark:text-slate-500 uppercase tracking-wider">
               {hasScore ? "/ 100" : "NO DOSSIER"}
             </span>
           </div>
@@ -166,30 +166,30 @@ export default function RiskScoreGauge({
         {/* Gauge Insights & 3 Evaluation Pillars */}
         <div className="space-y-3 text-xs max-w-xs">
           <div>
-            <div className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+            <div className="font-bold text-[#101828] dark:text-slate-100 text-sm">
               {summary.title}
             </div>
-            <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed mt-1">
+            <p className="text-[#475467] dark:text-slate-400 text-xs leading-relaxed mt-1">
               {summary.desc}
             </p>
           </div>
 
           {/* Separation of ML / Rule / Decision Pillars */}
           <div className="grid grid-cols-2 gap-2 pt-1">
-            <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-              <span className="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block">
+            <div className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/60 border border-[#D0D5DD] dark:border-slate-700">
+              <span className="text-[9px] uppercase font-bold text-[#667085] dark:text-slate-500 block">
                 Rule Validation
               </span>
-              <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+              <span className="font-bold text-[#101828] dark:text-slate-200 text-[11px]">
                 {summary.ruleBadge}
               </span>
             </div>
 
-            <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-              <span className="text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 block">
+            <div className="p-2 rounded-lg bg-[#F8FAFC] dark:bg-slate-800/60 border border-[#D0D5DD] dark:border-slate-700">
+              <span className="text-[9px] uppercase font-bold text-[#667085] dark:text-slate-500 block">
                 ML Risk Assessment
               </span>
-              <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">
+              <span className="font-bold text-[#101828] dark:text-slate-200 text-[11px]">
                 {hasScore ? riskLevel : "Ready for ML"}
               </span>
             </div>
@@ -201,23 +201,23 @@ export default function RiskScoreGauge({
       <div className="flex-1 py-4 space-y-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <MinusCircle className="w-3.5 h-3.5 text-rose-500" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#344054] dark:text-slate-300 flex items-center gap-1.5">
+              <MinusCircle className="w-3.5 h-3.5 text-[#B4233D]" />
               <span>Statutory Rule Deductions ({deductions.length})</span>
             </h4>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+            <span className="text-[11px] text-[#667085] dark:text-slate-500 font-mono">
               Total penalty: {totalPenalty} pts
             </span>
           </div>
 
           {!hasScore ? (
-            <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
+            <div className="p-3 bg-[#F8FAFC] dark:bg-slate-800/40 rounded-xl border border-[#D0D5DD] dark:border-slate-800 text-xs text-[#667085] dark:text-slate-400 flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-[#667085] shrink-0" />
               <span>No deductions evaluated yet. Ingest a bid dossier to calculate penalties.</span>
             </div>
           ) : deductions.length === 0 ? (
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="p-3 bg-[#DDF7EE] dark:bg-emerald-950/40 rounded-xl border border-[#8ED8C1] dark:border-emerald-800 text-xs text-[#087F5B] dark:text-emerald-300 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#087F5B] dark:text-emerald-400 shrink-0" />
               <span>Zero statutory deductions! Complete compliance achieved.</span>
             </div>
           ) : (
@@ -230,14 +230,14 @@ export default function RiskScoreGauge({
                 return (
                   <div 
                     key={idx} 
-                    className="p-3 bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-xl flex items-start justify-between gap-3 text-xs"
+                    className="p-3 bg-[#FDE7EA] dark:bg-rose-950/30 border border-[#F1A3AE] dark:border-rose-800 rounded-xl flex items-start justify-between gap-3 text-xs"
                   >
                     <div className="space-y-0.5">
-                      <div className="font-bold text-rose-900 dark:text-rose-200">{category}</div>
-                      <div className="text-slate-600 dark:text-slate-400 text-[11px]">{reason}</div>
+                      <div className="font-bold text-[#B4233D] dark:text-rose-200">{category}</div>
+                      <div className="text-[#475467] dark:text-slate-400 text-[11px]">{reason}</div>
                     </div>
                     {itemScore !== 0 && (
-                      <span className="font-mono font-bold text-rose-600 dark:text-rose-400 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-800 shrink-0">
+                      <span className="font-mono font-bold text-[#B4233D] dark:text-rose-400 bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-[#F1A3AE] dark:border-rose-800 shrink-0">
                         {itemScore} pts
                       </span>
                     )}
