@@ -1,0 +1,71 @@
+{
+  "model_name": "SIH26100_DualModel_LR_LightGBM_Fusion",
+  "version": "1.0.0",
+  "description": "Candidate dual-model compliance classification system for GeM bid verification",
+  "random_state": 42,
+  "classes": [
+    "Compliant",
+    "Needs Review",
+    "Non-Compliant"
+  ],
+  "numerical_features": [
+    "seller_experience_years",
+    "seller_turnover_inr",
+    "bid_value_inr",
+    "experience_certificate",
+    "technical_compliance_score",
+    "document_completeness_pct",
+    "price_deviation_pct",
+    "delivery_days",
+    "past_contracts_count",
+    "complaints_count",
+    "ocr_required"
+  ],
+  "categorical_features": [
+    "category",
+    "gst_status",
+    "pan_status",
+    "msme_status",
+    "oem_authorization",
+    "turnover_certificate",
+    "document_verification_status",
+    "gst_name_match",
+    "gst_registration_state_match",
+    "gst_return_filing_status"
+  ],
+  "all_features_ordered": [
+    "seller_experience_years",
+    "seller_turnover_inr",
+    "bid_value_inr",
+    "experience_certificate",
+    "technical_compliance_score",
+    "document_completeness_pct",
+    "price_deviation_pct",
+    "delivery_days",
+    "past_contracts_count",
+    "complaints_count",
+    "ocr_required",
+    "category",
+    "gst_status",
+    "pan_status",
+    "msme_status",
+    "oem_authorization",
+    "turnover_certificate",
+    "document_verification_status",
+    "gst_name_match",
+    "gst_registration_state_match",
+    "gst_return_filing_status"
+  ],
+  "default_fusion_weights": {
+    "LogisticRegression": 0.52,
+    "LightGBM": 0.48
+  },
+  "training_samples": 8000,
+  "test_samples": 2000,
+  "safety_audit": {
+    "fatal_nc_as_compliant": 0,
+    "nc_routed_to_needs_review": 9,
+    "compliant_routed_to_needs_review": 191,
+    "needs_review_escalated_to_nc": 33
+  }
+}

@@ -1,0 +1,1672 @@
+@import "tailwindcss";
+
+/* =========================================================
+   DESIGN SYSTEM TOKENS — LIGHT & DARK THEMES
+========================================================= */
+
+:root,
+[data-theme="light"],
+.light {
+  --bw-theme: light;
+  --bw-bg-main: #f8fafc;
+  --bw-bg-canvas: #f1f5f9;
+  --bw-bg-surface: #ffffff;
+  --bw-bg-surface-elevated: #ffffff;
+  --bw-bg-surface-soft: #f8fafc;
+  --bw-bg-surface-hover: #f1f5f9;
+  --bw-bg-sidebar: #0f172a;
+  --bw-bg-topbar: #ffffff;
+  --bw-bg-drawer: #ffffff;
+  --bw-bg-modal: #ffffff;
+  --bw-bg-input: #ffffff;
+
+  --bw-border-base: #e2e8f0;
+  --bw-border-subtle: #f1f5f9;
+  --bw-border-strong: #cbd5e1;
+
+  --bw-text-primary: #0f172a;
+  --bw-text-secondary: #334155;
+  --bw-text-muted: #64748b;
+  --bw-text-dim: #94a3b8;
+
+  --bw-accent-emerald: #059669;
+  --bw-accent-emerald-light: #ecfdf5;
+  --bw-accent-emerald-border: #a7f3d0;
+  --bw-accent-emerald-text: #047857;
+
+  --bw-status-qualified-bg: #ecfdf5;
+  --bw-status-qualified-border: #a7f3d0;
+  --bw-status-qualified-text: #065f46;
+
+  --bw-status-pending-bg: #fffbeb;
+  --bw-status-pending-border: #fde68a;
+  --bw-status-pending-text: #92400e;
+
+  --bw-status-disqualified-bg: #fef2f2;
+  --bw-status-disqualified-border: #fecaca;
+  --bw-status-disqualified-text: #991b1b;
+
+  --bw-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --bw-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --bw-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --bw-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"],
+.dark {
+  --bw-theme: dark;
+  --bw-bg-main: #07131c;
+  --bw-bg-canvas: #081722;
+  --bw-bg-surface: rgba(15, 34, 45, 0.88);
+  --bw-bg-surface-elevated: rgba(18, 41, 54, 0.95);
+  --bw-bg-surface-soft: rgba(255, 255, 255, 0.04);
+  --bw-bg-surface-hover: rgba(255, 255, 255, 0.075);
+  --bw-bg-sidebar: linear-gradient(180deg, #06131f 0%, #071925 48%, #05111c 100%);
+  --bw-bg-topbar: linear-gradient(180deg, rgba(10, 27, 37, 0.97), rgba(7, 19, 28, 0.97));
+  --bw-bg-drawer: #0d2531;
+  --bw-bg-modal: #0d2531;
+  --bw-bg-input: rgba(255, 255, 255, 0.05);
+
+  --bw-border-base: rgba(148, 163, 184, 0.14);
+  --bw-border-subtle: rgba(148, 163, 184, 0.09);
+  --bw-border-strong: rgba(148, 163, 184, 0.25);
+
+  --bw-text-primary: #f1f5f9;
+  --bw-text-secondary: #cbd5e1;
+  --bw-text-muted: #94a3b8;
+  --bw-text-dim: #64748b;
+
+  --bw-accent-emerald: #10b981;
+  --bw-accent-emerald-light: rgba(16, 185, 129, 0.12);
+  --bw-accent-emerald-border: rgba(16, 185, 129, 0.28);
+  --bw-accent-emerald-text: #6ee7b7;
+
+  --bw-status-qualified-bg: rgba(16, 185, 129, 0.12);
+  --bw-status-qualified-border: rgba(16, 185, 129, 0.3);
+  --bw-status-qualified-text: #6ee7b7;
+
+  --bw-status-pending-bg: rgba(245, 158, 11, 0.12);
+  --bw-status-pending-border: rgba(245, 158, 11, 0.3);
+  --bw-status-pending-text: #fcd34d;
+
+  --bw-status-disqualified-bg: rgba(239, 68, 68, 0.12);
+  --bw-status-disqualified-border: rgba(239, 68, 68, 0.3);
+  --bw-status-disqualified-text: #fca5a5;
+
+  --bw-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --bw-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --bw-shadow-lg: 0 14px 32px rgba(0, 0, 0, 0.45);
+  --bw-shadow-xl: 0 22px 55px rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================================
+   GLOBAL RESET & BASE
+========================================================= */
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--bw-bg-main);
+  color: var(--bw-text-primary);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bw-border-strong);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bw-text-dim);
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.bidwise-sidebar {
+  position: relative;
+  width: 280px;
+  min-width: 280px;
+  height: 100vh;
+  height: 100dvh;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #cbd5e1;
+  background: var(--bw-bg-sidebar);
+  border-right: 1px solid var(--bw-border-base);
+  box-shadow: 10px 0 35px rgba(2, 6, 23, 0.15);
+  z-index: 100;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+/* Light mode sidebar refinement */
+[data-theme="light"] .bidwise-sidebar {
+  background: linear-gradient(180deg, #0b1523 0%, #0d1a29 50%, #08111d 100%);
+  border-right: 1px solid #e2e8f0;
+  color: #cbd5e1;
+}
+
+.sidebar-bg-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(70px);
+  opacity: 0.13;
+  z-index: 0;
+}
+
+.sidebar-bg-glow-1 {
+  width: 190px;
+  height: 190px;
+  top: -95px;
+  left: -80px;
+  background: #10b981;
+}
+
+.sidebar-bg-glow-2 {
+  width: 170px;
+  height: 170px;
+  right: -100px;
+  bottom: 90px;
+  background: #06b6d4;
+}
+
+.sidebar-wave {
+  position: absolute;
+  top: -20px;
+  left: -30px;
+  width: 340px;
+  height: 180px;
+  pointer-events: none;
+  opacity: 0.12;
+  background: radial-gradient(
+    ellipse at 20% 5%,
+    transparent 34%,
+    rgba(45, 212, 191, 0.3) 35%,
+    transparent 37%
+  );
+  transform: rotate(-8deg);
+  z-index: 0;
+}
+
+.sidebar-top {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2;
+}
+
+.bidwise-brand {
+  position: relative;
+  min-height: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  gap: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(2, 6, 23, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+.bidwise-logo-box {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bidwise-logo-box::before {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.45);
+  filter: blur(14px);
+  opacity: 0.65;
+}
+
+.bidwise-logo {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #12333a 0%, #0a242c 45%, #071b24 100%);
+  border: 1px solid rgba(52, 211, 153, 0.38);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  z-index: 2;
+  color: #34d399;
+}
+
+.bidwise-logo svg {
+  width: 22px;
+  height: 22px;
+}
+
+.bidwise-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.bidwise-name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #f1f5f9;
+}
+
+.bidwise-name span {
+  color: #34d399;
+}
+
+.bidwise-subtitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.bidwise-ai-tag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 16px 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.bidwise-ai-tag svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.bidwise-search {
+  position: relative;
+  margin: 8px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.bidwise-search:focus-within {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.1);
+}
+
+.bidwise-search svg {
+  width: 14px;
+  height: 14px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.bidwise-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: #f1f5f9;
+  font-size: 11px;
+}
+
+.bidwise-search input::placeholder {
+  color: #64748b;
+}
+
+.bidwise-search kbd {
+  font-size: 9px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.bidwise-section {
+  padding: 8px 12px;
+}
+
+.bidwise-section-title {
+  padding: 6px 10px 4px;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #64748b;
+}
+
+.bidwise-main-nav,
+.bidwise-secondary-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bidwise-nav-item,
+.bidwise-secondary-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.bidwise-nav-item:hover,
+.bidwise-secondary-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+}
+
+.bidwise-nav-active {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.active-left-glow {
+  position: absolute;
+  left: -12px;
+  top: 15%;
+  height: 70%;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+}
+
+.bidwise-nav-icon,
+.bidwise-secondary-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+
+.bidwise-nav-active .bidwise-nav-icon {
+  background: #059669;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+}
+
+.bidwise-nav-icon svg,
+.bidwise-secondary-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bidwise-nav-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.bidwise-nav-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.2;
+}
+
+.bidwise-nav-subtitle {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.bidwise-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.bidwise-live-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.live-indicator {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #34d399;
+  animation: pulse 2s infinite;
+}
+
+.bidwise-nav-arrow,
+.bidwise-secondary-arrow {
+  width: 14px;
+  height: 14px;
+  color: #64748b;
+  opacity: 0.5;
+  transition: transform 0.18s ease;
+}
+
+.bidwise-nav-item:hover .bidwise-nav-arrow,
+.bidwise-secondary-item:hover .bidwise-secondary-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.bidwise-bottom {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(2, 6, 23, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.bidwise-user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bidwise-avatar-wrapper {
+  position: relative;
+}
+
+.bidwise-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #059669, #0d9488);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-online {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 1.5px solid #06131f;
+}
+
+.bidwise-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bidwise-user-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.2;
+}
+
+.bidwise-user-role {
+  font-size: 9px;
+  color: #6ee7b7;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 1px;
+}
+
+.bidwise-user-role svg {
+  width: 10px;
+  height: 10px;
+}
+
+.bidwise-user-email {
+  font-size: 8px;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bidwise-user-org {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+.bidwise-logout-button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.bidwise-logout-button:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.bidwise-api {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  font-size: 9px;
+  color: #64748b;
+}
+
+.bidwise-api-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bidwise-api-icon svg {
+  width: 11px;
+  height: 11px;
+  color: #34d399;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.bidwise-topbar {
+  position: relative;
+  min-height: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--bw-bg-topbar);
+  border-bottom: 1px solid var(--bw-border-base);
+  box-shadow: var(--bw-shadow-sm);
+  z-index: 80;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.bidwise-topbar-tender {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.bidwise-topbar-gem {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #ffffff;
+  font: 900 11px/1 Inter, sans-serif;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  flex-shrink: 0;
+}
+
+.bidwise-topbar-tender-copy {
+  min-width: 0;
+}
+
+.bidwise-topbar-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bw-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.bidwise-gem-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--bw-accent-emerald-light);
+  border: 1px solid var(--bw-accent-emerald-border);
+  color: var(--bw-accent-emerald-text);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.bidwise-topbar-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.bidwise-tender-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--bw-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.bidwise-tender-token-button {
+  border: none;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--bw-bg-surface-soft);
+  border: 1px solid var(--bw-border-base);
+  color: var(--bw-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 700 10px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  transition: all 0.18s ease;
+}
+
+.bidwise-tender-token-button:hover {
+  border-color: var(--bw-accent-emerald);
+  color: var(--bw-accent-emerald-text);
+}
+
+.bidwise-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.bidwise-live-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--bw-accent-emerald-text);
+  background: var(--bw-accent-emerald-light);
+  border: 1px solid var(--bw-accent-emerald-border);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.bidwise-topbar-subtitle {
+  max-width: 520px;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--bw-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.bidwise-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.bidwise-topbar-search {
+  width: 280px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 12px;
+  border: 1px solid var(--bw-border-base);
+  border-radius: 11px;
+  background: var(--bw-bg-surface-soft);
+  color: var(--bw-text-secondary);
+  transition: all 0.2s ease;
+}
+
+.bidwise-topbar-search:focus-within {
+  border-color: var(--bw-accent-emerald);
+  background: var(--bw-bg-surface);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.bidwise-topbar-search input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--bw-text-primary);
+  font-size: 11px;
+}
+
+.bidwise-topbar-search input::placeholder {
+  color: var(--bw-text-dim);
+}
+
+.bidwise-topbar-search kbd {
+  border: 1px solid var(--bw-border-base);
+  background: var(--bw-bg-surface);
+  border-radius: 4px;
+  padding: 2px 4px;
+  color: var(--bw-text-dim);
+  font-size: 9px;
+  font-family: inherit;
+}
+
+.bidwise-icon-button {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--bw-border-base);
+  border-radius: 11px;
+  background: var(--bw-bg-surface-soft);
+  color: var(--bw-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bidwise-icon-button:hover,
+.bidwise-icon-button.active {
+  color: var(--bw-accent-emerald-text);
+  border-color: var(--bw-accent-emerald-border);
+  background: var(--bw-accent-emerald-light);
+}
+
+.bidwise-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 11px;
+  border: 1px solid var(--bw-border-base);
+  background: var(--bw-bg-surface-soft);
+  color: var(--bw-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bidwise-theme-toggle:hover {
+  background: var(--bw-bg-surface-hover);
+  border-color: var(--bw-border-strong);
+  color: var(--bw-text-primary);
+}
+
+.bidwise-theme-toggle svg {
+  width: 15px;
+  height: 15px;
+  color: var(--bw-accent-emerald);
+}
+
+.bidwise-topbar-upload {
+  height: 38px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 11px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+  transition: all 0.2s ease;
+}
+
+.bidwise-topbar-upload:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bidwise-notification-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f43f5e;
+}
+
+/* =========================================================
+   POPOVERS (TOKEN & ALERTS)
+========================================================= */
+
+.bidwise-token-popover,
+.bidwise-alert-popover {
+  position: absolute;
+  top: 76px;
+  right: 24px;
+  width: 360px;
+  padding: 16px;
+  border: 1px solid var(--bw-border-base);
+  border-radius: 18px;
+  background: var(--bw-bg-surface-elevated);
+  box-shadow: var(--bw-shadow-xl);
+  backdrop-filter: blur(20px);
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.bidwise-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bw-border-subtle);
+}
+
+.bidwise-popover-head > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bw-text-primary);
+  font-size: 12px;
+}
+
+.bidwise-token-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--bw-border-base);
+  border-radius: 10px;
+  background: var(--bw-bg-surface-soft);
+  color: var(--bw-accent-emerald-text);
+  font: 10px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.bidwise-token-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--bw-text-muted);
+  font-size: 10px;
+}
+
+.bidwise-token-actions button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--bw-accent-emerald-border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: var(--bw-accent-emerald-text);
+  background: var(--bw-accent-emerald-light);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.bidwise-alert-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bw-border-subtle);
+}
+
+.bidwise-alert-item:last-child {
+  border-bottom: none;
+}
+
+.bidwise-alert-item strong {
+  color: var(--bw-text-primary);
+  font-size: 11px;
+}
+
+.bidwise-alert-item small {
+  color: var(--bw-text-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   MAIN CONTENT AREA & THEME AWARE CONTAINERS
+========================================================= */
+
+main.flex-1 {
+  background: var(--bw-bg-canvas);
+  color: var(--bw-text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Base Card Styling Across All Pages */
+[data-theme="light"] .bg-white,
+[data-theme="light"] .bidwise-card {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+}
+
+[data-theme="light"] .bg-slate-50 {
+  background-color: #f8fafc;
+}
+
+[data-theme="light"] .bg-slate-100 {
+  background-color: #f1f5f9;
+}
+
+[data-theme="light"] .text-slate-900 {
+  color: #0f172a;
+}
+
+[data-theme="light"] .text-slate-800 {
+  color: #1e293b;
+}
+
+[data-theme="light"] .text-slate-700 {
+  color: #334155;
+}
+
+[data-theme="light"] .text-slate-600 {
+  color: #475569;
+}
+
+[data-theme="light"] .text-slate-500 {
+  color: #64748b;
+}
+
+[data-theme="light"] .text-slate-400 {
+  color: #94a3b8;
+}
+
+[data-theme="light"] .border-slate-200,
+[data-theme="light"] .border-slate-100 {
+  border-color: #e2e8f0;
+}
+
+/* Dark Theme Overrides for Components */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bidwise-card {
+  background: rgba(15, 34, 45, 0.82) !important;
+  border-color: rgba(148, 163, 184, 0.14) !important;
+  color: #f1f5f9 !important;
+  backdrop-filter: blur(16px);
+}
+
+[data-theme="dark"] .bg-slate-50 {
+  background: rgba(10, 27, 37, 0.65) !important;
+}
+
+[data-theme="dark"] .bg-slate-100 {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .text-slate-500 {
+  color: #64748b !important;
+}
+
+[data-theme="dark"] .text-slate-400 {
+  color: #64748b !important;
+}
+
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-100 {
+  border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+[data-theme="dark"] tr:hover {
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(148, 163, 184, 0.15) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Modal & Drawer Theme Integration */
+[data-theme="dark"] .fixed.inset-0 .bg-white {
+  background: rgba(13, 37, 49, 0.95) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .fixed.inset-0 .bg-slate-50 {
+  background: rgba(10, 27, 37, 0.8) !important;
+}
+
+[data-theme="dark"] .fixed.inset-0 .border-slate-200,
+[data-theme="dark"] .fixed.inset-0 .border-slate-100 {
+  border-color: rgba(148, 163, 184, 0.12) !important;
+}
+
+/* Secondary Pages (Audit, Rules, Settings, Analytics) */
+.bidwise-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bidwise-page-hero {
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--bw-border-base);
+  background: var(--bw-bg-surface);
+  box-shadow: var(--bw-shadow-sm);
+}
+
+.bidwise-page-hero h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bw-text-primary);
+  margin: 4px 0;
+  letter-spacing: -0.02em;
+}
+
+.bidwise-page-hero p {
+  font-size: 12px;
+  color: var(--bw-text-muted);
+  margin: 0;
+}
+
+.bidwise-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--bw-accent-emerald-text);
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+.bidwise-panel {
+  border-radius: 20px;
+  border: 1px solid var(--bw-border-base);
+  background: var(--bw-bg-surface);
+  box-shadow: var(--bw-shadow-sm);
+  overflow: hidden;
+}
+
+.bidwise-panel-heading {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--bw-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bidwise-panel-heading h2 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--bw-text-primary);
+  margin: 0;
+}
+
+.bidwise-panel-heading p {
+  font-size: 11px;
+  color: var(--bw-text-muted);
+  margin: 2px 0 0;
+}
+
+.bidwise-audit-summary,
+.bidwise-rule-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.bidwise-summary-card,
+.bidwise-rule-cards > div,
+.bidwise-info-card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--bw-border-base);
+  background: var(--bw-bg-surface);
+  box-shadow: var(--bw-shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.bidwise-summary-card strong,
+.bidwise-rule-cards strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--bw-text-primary);
+  display: block;
+}
+
+.bidwise-summary-card span,
+.bidwise-rule-cards span {
+  font-size: 11px;
+  color: var(--bw-text-muted);
+}
+
+.bidwise-audit-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--bw-border-subtle);
+}
+
+.bidwise-audit-row:last-child {
+  border-bottom: none;
+}
+
+.bidwise-audit-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--bw-accent-emerald-light);
+  color: var(--bw-accent-emerald);
+}
+
+.bidwise-audit-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.bidwise-audit-copy strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bw-text-primary);
+  display: block;
+}
+
+.bidwise-audit-copy span {
+  font-size: 11px;
+  color: var(--bw-text-muted);
+}
+
+.bidwise-audit-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 140px;
+}
+
+.bidwise-audit-progress > div {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bw-border-base);
+  overflow: hidden;
+}
+
+.bidwise-audit-progress i {
+  display: block;
+  height: 100%;
+  background: #10b981;
+  border-radius: inherit;
+}
+
+.bidwise-audit-progress b {
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--bw-text-primary);
+}
+
+.bidwise-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.bidwise-pill.good {
+  background: var(--bw-status-qualified-bg);
+  color: var(--bw-status-qualified-text);
+  border: 1px solid var(--bw-status-qualified-border);
+}
+
+.bidwise-pill.warn {
+  background: var(--bw-status-pending-bg);
+  color: var(--bw-status-pending-text);
+  border: 1px solid var(--bw-status-pending-border);
+}
+
+.bidwise-rule {
+  border-bottom: 1px solid var(--bw-border-subtle);
+}
+
+.bidwise-rule:last-child {
+  border-bottom: none;
+}
+
+.bidwise-rule button {
+  width: 100%;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  color: var(--bw-text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.bidwise-rule button span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bidwise-rule-body {
+  padding: 0 20px 16px 46px;
+  font-size: 12px;
+  color: var(--bw-text-muted);
+  line-height: 1.5;
+}
+
+.bidwise-rule-note {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--bw-status-pending-bg);
+  border: 1px solid var(--bw-status-pending-border);
+  color: var(--bw-status-pending-text);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* Settings Toggle */
+.bidwise-toggle {
+  width: 42px;
+  height: 24px;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--bw-border-strong);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.bidwise-toggle span {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.bidwise-toggle.on {
+  background: #059669;
+}
+
+.bidwise-toggle.on span {
+  transform: translateX(18px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .bidwise-topbar-subtitle {
+    max-width: 320px;
+  }
+  .bidwise-topbar-search {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .bidwise-sidebar {
+    display: none;
+  }
+  .bidwise-topbar-subtitle,
+  .bidwise-live-label {
+    display: none;
+  }
+}
+
+/* =========================================================
+   LOGIN SCREEN STYLES (LIGHT & DARK THEMES)
+========================================================= */
+
+.bidwise-login-screen {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px 40px;
+  overflow-y: auto;
+  background-color: var(--bw-bg-main);
+  transition: background-color 0.2s ease;
+}
+
+[data-theme="dark"] .bidwise-login-screen {
+  background: radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.12), transparent 40%),
+              radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.08), transparent 40%),
+              linear-gradient(180deg, #06131f 0%, #081722 50%, #05111c 100%);
+}
+
+[data-theme="light"] .bidwise-login-screen {
+  background: radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.07), transparent 35%),
+              radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.05), transparent 35%),
+              linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.bidwise-login-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--bw-border-subtle);
+  background: var(--bw-bg-surface);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+.bidwise-login-gem-badge {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #ffffff;
+  font: 900 11px/1 Inter, sans-serif;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+  flex-shrink: 0;
+}
+
+.bidwise-login-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(90px);
+  z-index: 0;
+}
+
+.bidwise-login-glow-1 {
+  width: 380px;
+  height: 380px;
+  top: 10%;
+  left: 15%;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.bidwise-login-glow-2 {
+  width: 340px;
+  height: 340px;
+  bottom: 10%;
+  right: 15%;
+  background: rgba(6, 182, 212, 0.06);
+}
+
+.bidwise-login-card {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  border-radius: 24px;
+  border: 1px solid var(--bw-border-base);
+  background: var(--bw-bg-surface);
+  box-shadow: var(--bw-shadow-xl);
+  backdrop-filter: blur(20px);
+  z-index: 2;
+}
+
+.bidwise-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.bidwise-login-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.3);
+}
+
+.bidwise-login-brand strong {
+  display: block;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--bw-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.bidwise-login-brand strong span {
+  color: #10b981;
+}
+
+.bidwise-login-brand small {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--bw-text-muted);
+  margin-top: 2px;
+}
+
+.bidwise-login-heading {
+  margin-bottom: 20px;
+}
+
+.bidwise-login-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--bw-accent-emerald-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bidwise-login-heading h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--bw-text-primary);
+  margin: 4px 0 6px;
+  letter-spacing: -0.02em;
+}
+
+.bidwise-login-heading p {
+  font-size: 12px;
+  color: var(--bw-text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.bidwise-login-button {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.25);
+  transition: all 0.2s ease;
+}
+
+.bidwise-login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bidwise-login-error {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bw-status-disqualified-bg);
+  border: 1px solid var(--bw-status-disqualified-border);
+  color: var(--bw-status-disqualified-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.bidwise-login-security {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--bw-text-muted);
+}
+
+.bidwise-login-demo {
+  text-align: center;
+  font-size: 10px;
+  color: var(--bw-text-dim);
+  margin: 10px 0 0;
+}
+

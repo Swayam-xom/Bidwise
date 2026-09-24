@@ -1,0 +1,29 @@
+# GeM Bid Compliance & Technical Evaluation Engine Requirements
+# ML Runtime Compatibility: scikit-learn pinned to 1.7.2 to match trained model artifacts
+
+# Web Framework & API
+fastapi>=0.136.0
+uvicorn>=0.46.0
+pydantic>=2.13.0
+python-multipart>=0.0.20
+
+# Database & ORM
+SQLAlchemy>=2.0.40
+
+# Document Ingestion & PDF Processing
+pypdf>=6.18.0
+reportlab>=5.0.0
+pillow>=12.0.0
+
+# Machine Learning Runtime (Strictly Pinned for Serialized Artifact Compatibility)
+scikit-learn==1.7.2
+lightgbm==4.7.0
+joblib==1.6.0
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+
+# Security & Utilities
+cryptography>=47.0.0
+python-dotenv>=1.2.0
+pytest>=9.0.0
