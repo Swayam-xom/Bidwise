@@ -16,6 +16,26 @@ import {
 } from 'lucide-react';
 
 export default function ExtractedJsonViewer({ jsonData, bidderData }) {
+  if (!jsonData && !bidderData) {
+    return (
+      <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden p-8 text-center flex flex-col items-center justify-center min-h-[380px]">
+        <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 mb-4">
+          <ShieldCheck className="w-7 h-7 text-slate-400 dark:text-slate-500" />
+        </div>
+        <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1.5">
+          Extracted Dossier Identity & Evidence
+        </h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed mb-5">
+          No bidder dossier uploaded yet. Upload a technical bid dossier (PDF) to extract bidder identity, PAN, GSTIN, EPFO, ESIC, Bank details, and Make in India compliance evidence.
+        </p>
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold border border-slate-200 dark:border-slate-700 font-mono">
+          <Database className="w-3.5 h-3.5" />
+          Awaiting Document Ingestion
+        </span>
+      </div>
+    );
+  }
+
   const bidder = jsonData?.bidder_identity || {};
   const extracted = jsonData?.extracted_data || {};
   const financial = jsonData?.financial_profile || {};
@@ -28,6 +48,36 @@ export default function ExtractedJsonViewer({ jsonData, bidderData }) {
     bidderData?.udyam ||
     extracted?.udyam ||
     bidder?.udyam_registration ||
+    'N/A';
+
+  const epfo =
+    bidderData?.epfo ||
+    extracted?.epfo ||
+    jsonData?.epfo ||
+    'N/A';
+
+  const esic =
+    bidderData?.esic ||
+    extracted?.esic ||
+    jsonData?.esic ||
+    'N/A';
+
+  const bankName =
+    bidderData?.bankName ||
+    (jsonData?.bank && jsonData.bank.bank_name) ||
+    extracted?.bank_name ||
+    'N/A';
+
+  const accountNumber =
+    bidderData?.accountNumber ||
+    (jsonData?.bank && jsonData.bank.account_number) ||
+    extracted?.account_number ||
+    'N/A';
+
+  const ifsc =
+    bidderData?.ifsc ||
+    (jsonData?.bank && jsonData.bank.ifsc) ||
+    extracted?.ifsc ||
     'N/A';
 
   const localContent =
@@ -60,10 +110,10 @@ export default function ExtractedJsonViewer({ jsonData, bidderData }) {
 
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                Extracted Dossier Identity & Rules
+                Extracted Dossier Identity & Evidence
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Extracted via OCR and validated against statutory gates
+                Extracted from technical bidder PDF dossier and validated against statutory gates
               </p>
             </div>
           </div>
@@ -96,7 +146,7 @@ export default function ExtractedJsonViewer({ jsonData, bidderData }) {
         <div className="flex items-center gap-2 mb-4">
           <Building2 className="w-4 h-4 text-slate-500 dark:text-slate-400" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Bidder Legal Entity
+            Bidder Legal Entity & Statutory Criteria
           </h3>
         </div>
 
@@ -172,7 +222,7 @@ export default function ExtractedJsonViewer({ jsonData, bidderData }) {
               {udyam}
             </p>
             <p className="mt-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-              {udyam !== 'N/A' ? 'MSME Verified' : 'Not Declared'}
+              {udyam !== 'N/A' ? 'Provided in Bidder Dossier' : 'Not Declared'}
             </p>
           </div>
 
@@ -200,6 +250,88 @@ export default function ExtractedJsonViewer({ jsonData, bidderData }) {
                 }}
               />
             </div>
+          </div>
+
+          {/* EPFO REGISTRATION */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-slate-400" />
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
+                EPFO Registration
+              </span>
+            </div>
+            <p className="mt-2 font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
+              {epfo}
+            </p>
+            <p className="mt-1 text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+              {epfo !== 'N/A' ? 'Social Security Code Detected' : 'Not Declared'}
+            </p>
+          </div>
+
+          {/* ESIC REGISTRATION (DOCUMENT EXTRACTED ONLY) */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-slate-400" />
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
+                  ESIC Registration
+                </span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-sm bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium">
+                Document Extracted
+              </span>
+            </div>
+            <p className="mt-2 font-mono text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+              {esic}
+            </p>
+            <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+              {esic !== 'N/A' ? 'Provided in Bidder Dossier' : 'Not Provided in Dossier'}
+            </p>
+          </div>
+
+          {/* BANK PARTICULARS (DOCUMENT EXTRACTED ONLY) */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-slate-400" />
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
+                  Bank Details
+                </span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-sm bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium">
+                Document Extracted
+              </span>
+            </div>
+            <p className="mt-2 text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+              {bankName !== 'N/A' ? bankName : 'Bank Not Declared'}
+            </p>
+            <p className="mt-0.5 font-mono text-[11px] text-slate-600 dark:text-slate-400 truncate">
+              {accountNumber !== 'N/A' ? `A/C: ${accountNumber}` : 'A/C: N/A'}
+            </p>
+            <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+              Supporting Commercial Evidence
+            </p>
+          </div>
+
+          {/* BANK IFSC CODE (DOCUMENT EXTRACTED ONLY) */}
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Fingerprint className="w-4 h-4 text-slate-400" />
+                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
+                  Bank IFSC Code
+                </span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded-sm bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium">
+                Document Extracted
+              </span>
+            </div>
+            <p className="mt-2 font-mono text-sm font-bold text-slate-900 dark:text-slate-100">
+              {ifsc}
+            </p>
+            <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+              {ifsc !== 'N/A' ? 'Provided in Bidder Dossier' : 'Not Declared'}
+            </p>
           </div>
         </div>
 

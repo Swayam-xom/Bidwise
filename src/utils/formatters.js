@@ -124,6 +124,11 @@ export function normalizeBidRecord(item, defaultIndex = 1) {
   const panVal = ext.pan || item.pan || "N/A";
   const gstinVal = ext.gstin || item.gstin || "N/A";
   const udyamVal = ext.udyam || item.udyam || "N/A";
+  const epfoVal = ext.epfo || item.epfo || "N/A";
+  const esicVal = ext.esic || item.esic || "N/A";
+  const bankNameVal = ext.bank_name || (item.bank && item.bank.bank_name) || item.bank_name || "N/A";
+  const accountNumVal = ext.account_number || (item.bank && item.bank.account_number) || item.account_number || "N/A";
+  const ifscVal = ext.ifsc || (item.bank && item.bank.ifsc) || item.ifsc || "N/A";
   const quoteVal = Number(item.quote_amount || item.quoted_price || item.quoteAmount || 5000000);
 
   return {
@@ -136,6 +141,12 @@ export function normalizeBidRecord(item, defaultIndex = 1) {
     gstin: gstinVal,
     gstStatus: gstinVal !== 'N/A' && gstinVal ? (score < 60 ? 'Suspended' : 'Active') : (item.gstStatus || 'Active'),
     udyam: udyamVal,
+    epfo: epfoVal,
+    esic: esicVal,
+    bankName: bankNameVal,
+    accountNumber: accountNumVal,
+    ifsc: ifscVal,
+    bank: item.bank || { bank_name: bankNameVal, account_number: accountNumVal, ifsc: ifscVal },
     msmeType: item.msmeType || "Medium Enterprise",
     localContentPct: mii,
     localClass: mii >= 50 ? "Class-I Local Supplier" : "Non-Local Supplier",

@@ -3,12 +3,16 @@ import json
 import urllib.parse
 import sys
 import os
-import requests
+from starlette.testclient import TestClient
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from backend.server import app
+from backend.database import init_db, SessionLocal, Tender
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+
+client = TestClient(app)
 
 def create_pdf(fields):
     buf = io.BytesIO()
@@ -21,7 +25,8 @@ def create_pdf(fields):
     return buf.getvalue()
 
 def run_audit():
-    auth_res = requests.post("http://127.0.0.1:8000/api/auth/token", json={"tender_id": "GEM/2026/B/892101", "role": "procurement_officer"})
+    init_db()
+    auth_res = client.post("/api/auth/token", json={"tender_id": "GEM/2026/B/892101", "role": "procurement_officer"})
     token = auth_res.json().get("token")
     headers = {"Authorization": f"Bearer {token}"}
 
@@ -87,7 +92,7 @@ def run_audit():
         pdf_bytes = create_pdf(sc["data"])
         
         # 1. Test /api/verify
-        verify_res = requests.post("http://127.0.0.1:8000/api/verify", files={"file": ("test.pdf", pdf_bytes, "application/pdf")}, headers=headers)
+        verify_res = client.post("/api/verify", files={"file": ("test.pdf", pdf_bytes, "application/pdf")}, headers=headers)
         v_data = verify_res.json()
         score = v_data.get("compliance_score")
         status = v_data.get("status")
@@ -103,7 +108,7 @@ def run_audit():
         # 2. Test Submit to DB
         files = {"file": ("test.pdf", pdf_bytes, "application/pdf")}
         submit_data = {"tender_id": "GEM/2026/B/892101", "company_name": sc["data"]["Company"], "quoted_price": str(sc["quote"])}
-        sub_res = requests.post("http://127.0.0.1:8000/api/bids/submit", files=files, data=submit_data, headers=headers)
+        sub_res = client.post("/api/bids/submit", files=files, data=submit_data, headers=headers)
         bid_id = sub_res.json().get("bid_id")
         print(f"  [Persisted Bid ID] {bid_id}")
         
@@ -112,7 +117,6 @@ def run_audit():
         print(f"  [L1 Candidate Pool Inclusion] Eligible for L1 Ranking: {is_in_l1_pool}")
         
         # Reset tender to Active for clean award test
-        from backend.database import SessionLocal, Tender
         db_s = SessionLocal()
         t = db_s.query(Tender).filter(Tender.tender_id == "GEM/2026/B/892101").first()
         if t:
@@ -122,12 +126,12 @@ def run_audit():
         db_s.close()
 
         # 4. Test Award Endpoint Attempt
-        award_res = requests.post(f"http://127.0.0.1:8000/api/tenders/{encoded_tender}/award", json={"bid_id": bid_id}, headers=headers)
+        award_res = client.post(f"/api/tenders/{encoded_tender}/award", json={"bid_id": bid_id}, headers=headers)
         resp_detail = award_res.json().get("detail", award_res.json().get("status"))
         print(f"  [Award Endpoint Result] HTTP {award_res.status_code} | {resp_detail}")
         
         # Cleanup submitted bid & restore Active tender
-        requests.delete(f"http://127.0.0.1:8000/api/bids/{bid_id}", headers=headers)
+        client.delete(f"/api/bids/{bid_id}", headers=headers)
         db_s = SessionLocal()
         t = db_s.query(Tender).filter(Tender.tender_id == "GEM/2026/B/892101").first()
         if t:

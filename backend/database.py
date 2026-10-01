@@ -59,6 +59,10 @@ class Bid(Base):
     gstin = Column(String(20), nullable=True)
     udyam = Column(String(32), nullable=True)
     epfo = Column(String(32), nullable=True)
+    esic = Column(String(64), nullable=True)
+    bank_name = Column(String(128), nullable=True)
+    account_number = Column(String(64), nullable=True)
+    ifsc = Column(String(32), nullable=True)
     local_content_percent = Column(Float, nullable=True)
     submitted_at = Column(String(64), nullable=False)
     document_name = Column(String(255), nullable=True)
@@ -381,14 +385,19 @@ def reset_demo_data():
         raise e
     finally:
         db.close()
-
-
-def seed_canonical_bidders():
-    """Explicitly seeds the 12 canonical demo bidders (optional manual utility, never called automatically)."""
-    Base.metadata.create_all(bind=engine)
+def seed_canonical_bidders(force_reseed: bool = False) -> dict:
+    """
+    IDEMPOTENT CANONICAL BIDDER SEEDING MECHANISM:
+    Seeds canonical demo bidders using stable keys (bid_id or tender_id + PAN).
+    Never creates duplicate records across multiple startups or restarts.
+    """
     db = SessionLocal()
     try:
-        # 1. Reset or Create canonical active tender
+        now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        import json
+        from backend.ml.ml_adapter import evaluate_bid_ml_compliance
+
+        # 1. Tender initialization
         tender = db.query(Tender).filter(Tender.tender_id == "GEM/2026/B/892101").first()
         if not tender:
             tender = Tender(
@@ -396,28 +405,44 @@ def seed_canonical_bidders():
                 title="Supply, Configuration & 3-Yr Support of 500 Enterprise Laptops",
                 organization="Ministry of Electronics & Information Technology (MeitY)",
                 estimated_budget=60000000.0,
-                created_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                created_at=now_iso,
                 status="Active",
                 awarded_bid_id=None
             )
             db.add(tender)
-        else:
-            tender.status = "Active"
-            tender.awarded_bid_id = None
-        db.commit()
+            db.commit()
 
-        # 2. Delete all existing deductions, audit logs, and bids
-        db.query(Deduction).delete()
-        db.query(AuditLog).delete()
-        db.query(Bid).delete()
-        db.commit()
-
-        # 3. Seed exactly 12 canonical bidders with ML predictions
-        now_iso = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-        import json
-        from backend.ml.ml_adapter import evaluate_bid_ml_compliance
+        seeded_count = 0
+        updated_count = 0
 
         for item in SEED_BIDDERS:
+            pan_clean = item["pan"].strip().upper() if item.get("pan") else ""
+            name_clean = item["bidder_name"].strip()
+            
+            # Check for existing canonical record by stable bid_id or (tender_id, pan) or (tender_id, bidder_name)
+            existing_bid = db.query(Bid).filter(
+                (Bid.bid_id == item["bid_id"]) | 
+                ((Bid.tender_id == "GEM/2026/B/892101") & (Bid.pan == pan_clean)) |
+                ((Bid.tender_id == "GEM/2026/B/892101") & (Bid.bidder_name.ilike(name_clean)))
+            ).first()
+
+            if existing_bid:
+                if force_reseed:
+                    existing_bid.bidder_name = item["bidder_name"]
+                    existing_bid.legal_name = item["legal_name"]
+                    existing_bid.quote_amount = item["quote_amount"]
+                    existing_bid.compliance_score = item["compliance_score"]
+                    existing_bid.status = item["status"]
+                    existing_bid.risk_level = item["risk_level"]
+                    existing_bid.pan = item["pan"]
+                    existing_bid.gstin = item["gstin"]
+                    existing_bid.udyam = item["udyam"]
+                    existing_bid.epfo = item["epfo"]
+                    existing_bid.local_content_percent = item["local_content_percent"]
+                    existing_bid.officer_remark = item["officer_remark"]
+                    updated_count += 1
+                continue
+
             dossier_data = {
                 "pan": item["pan"],
                 "gstin": item["gstin"],
@@ -493,9 +518,10 @@ def seed_canonical_bidders():
                 timestamp=now_iso
             )
             db.add(initial_audit)
+            seeded_count += 1
 
         db.commit()
-        return {"status": "success", "message": f"Successfully seeded {len(SEED_BIDDERS)} demo bidders."}
+        return {"status": "success", "message": f"Seeded {seeded_count} canonical records, {updated_count} updated."}
     except Exception as e:
         db.rollback()
         raise e
@@ -503,8 +529,55 @@ def seed_canonical_bidders():
         db.close()
 
 
+def deduplicate_bids_table() -> int:
+    """
+    Safely deduplicates any existing duplicate bid records in SQLite.
+    Preserves the latest submission for each (tender_id, pan) or (tender_id, bidder_name)
+    and removes orphan duplicates.
+    """
+    db = SessionLocal()
+    try:
+        all_bids = db.query(Bid).order_by(Bid.id.asc()).all()
+        seen = {}
+        duplicates_to_delete = []
+
+        for b in all_bids:
+            pan_clean = (b.pan or "").strip().upper()
+            if pan_clean and pan_clean not in ["", "N/A", "NONE", "NULL"]:
+                key = (b.tender_id.strip(), pan_clean)
+            else:
+                key = (b.tender_id.strip(), b.bidder_name.strip().lower())
+
+            if key in seen:
+                prev_bid = seen[key]
+                # If seen[key] is canonical (BID-8921-) and b is not, delete b
+                if prev_bid.bid_id.startswith("BID-8921-") and not b.bid_id.startswith("BID-8921-"):
+                    duplicates_to_delete.append(b.bid_id)
+                elif b.bid_id.startswith("BID-8921-") and not prev_bid.bid_id.startswith("BID-8921-"):
+                    duplicates_to_delete.append(prev_bid.bid_id)
+                    seen[key] = b
+                else:
+                    duplicates_to_delete.append(prev_bid.bid_id)
+                    seen[key] = b
+            else:
+                seen[key] = b
+
+        for dup_id in duplicates_to_delete:
+            db.query(Deduction).filter(Deduction.bid_id == dup_id).delete()
+            db.query(AuditLog).filter(AuditLog.bid_id == dup_id).delete()
+            db.query(Bid).filter(Bid.bid_id == dup_id).delete()
+
+        db.commit()
+        return len(duplicates_to_delete)
+    except Exception as e:
+        db.rollback()
+        return 0
+    finally:
+        db.close()
+
+
 def init_db():
-    """Initializes SQLite tables and active tender record without automatic bidder seeding."""
+    """Initializes SQLite tables, migrations, tender record, and enforces duplicate-free state."""
     Base.metadata.create_all(bind=engine)
 
     # Safe lightweight schema migration for existing SQLite database
@@ -513,6 +586,10 @@ def init_db():
             ("extraction_method", "VARCHAR(32) DEFAULT 'pdf_text'"),
             ("page_count", "INTEGER DEFAULT 1"),
             ("evidence_json", "TEXT NULL"),
+            ("esic", "VARCHAR(64) NULL"),
+            ("bank_name", "VARCHAR(128) NULL"),
+            ("account_number", "VARCHAR(64) NULL"),
+            ("ifsc", "VARCHAR(32) NULL"),
             ("ml_predicted_label", "VARCHAR(64) NULL"),
             ("ml_confidence", "FLOAT NULL"),
             ("ml_risk_score", "FLOAT NULL"),
@@ -528,9 +605,12 @@ def init_db():
             except Exception:
                 pass  # Column already exists
 
+    # Run safe deduplication on startup
+    deduplicate_bids_table()
+
     db = SessionLocal()
     try:
-        # 1. Tender initialization
+        # Tender initialization
         tender = db.query(Tender).filter(Tender.tender_id == "GEM/2026/B/892101").first()
         if not tender:
             tender = Tender(
@@ -543,8 +623,6 @@ def init_db():
             )
             db.add(tender)
             db.commit()
-
-        # No automatic bidder seeding here - starts with zero bids.
     except Exception as e:
         db.rollback()
         raise e
@@ -554,8 +632,8 @@ def init_db():
 if __name__ == "__main__":
     import sys
     if "--seed" in sys.argv or "seed" in sys.argv:
-        print("[DATABASE] Explicitly seeding demo dataset with 12 canonical bidders...")
-        res = seed_canonical_bidders()
+        print("[DATABASE] Explicitly seeding demo dataset with canonical bidders...")
+        res = seed_canonical_bidders(force_reseed=True)
         print(f"[DATABASE] {res['message']}")
     elif "--reset" in sys.argv or "reset" in sys.argv:
         print("[DATABASE] Resetting database (clearing bids, preserving active tender)...")
@@ -563,5 +641,5 @@ if __name__ == "__main__":
         print(f"[DATABASE] {res['message']}")
     else:
         init_db()
-        print("[DATABASE] Initialized successfully with 0 pre-seeded bidders.")
+        print("[DATABASE] Initialized successfully with duplicate protection.")
 

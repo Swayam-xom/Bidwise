@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export default function PipelineTracker({ 
-  currentStep = 5, 
+  currentStep = 0, 
   isAnalyzing = false,
   failedStep = null,
   fileName,
@@ -66,7 +66,7 @@ export default function PipelineTracker({
             Verification Sequence:
           </span>
           <span className="font-mono bg-[#EEF2F6] dark:bg-slate-800 text-[#101828] dark:text-slate-300 px-2 py-0.5 rounded font-semibold truncate max-w-xs border border-[#D0D5DD] dark:border-slate-700">
-            {fileName || "Awaiting dossier"}
+            {fileName || "Awaiting dossier upload"}
           </span>
           {fileSize && (
             <span className="text-[#667085] dark:text-slate-500 font-mono text-[11px]">({fileSize})</span>
@@ -75,9 +75,13 @@ export default function PipelineTracker({
 
         <div className="flex items-center gap-2 text-[#667085] dark:text-slate-400 font-mono text-[11px]">
           <span>Hash:</span>
-          <span className="text-[#101828] dark:text-slate-300 font-medium">{fileHash || "sha256:awaiting..."}</span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded bg-[#DDF7EE] dark:bg-emerald-950/40 text-[#087F5B] dark:text-emerald-400 border border-[#8ED8C1] dark:border-emerald-800 text-[10px] font-bold">
-            INTEGRITY READY
+          <span className="text-[#101828] dark:text-slate-300 font-medium">{fileHash || "sha256: awaiting..."}</span>
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${
+            fileHash 
+              ? 'bg-[#DDF7EE] dark:bg-emerald-950/40 text-[#087F5B] dark:text-emerald-400 border-[#8ED8C1] dark:border-emerald-800' 
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+          }`}>
+            {fileHash ? 'INTEGRITY READY' : 'STANDBY'}
           </span>
         </div>
       </div>
@@ -88,7 +92,18 @@ export default function PipelineTracker({
           const Icon = step.icon;
           const isFailed = failedStep === step.id;
           const isCurrent = isAnalyzing && currentStep === step.id;
-          const isCompleted = !isFailed && (currentStep > step.id || (!isAnalyzing && currentStep >= step.id));
+          const isCompleted = !isFailed && currentStep > 0 && (currentStep > step.id || (!isAnalyzing && currentStep >= step.id));
+          const isReady = !isFailed && !isCurrent && !isCompleted && step.id === 1 && currentStep === 1;
+
+          const statusText = isFailed 
+            ? 'FAILED' 
+            : isCurrent 
+            ? 'PROCESSING' 
+            : isCompleted 
+            ? 'COMPLETED' 
+            : isReady
+            ? 'READY'
+            : 'PENDING';
 
           return (
             <div 
@@ -100,6 +115,8 @@ export default function PipelineTracker({
                   ? 'bg-[#E8F7F2] dark:bg-emerald-950/40 border-[#8ED8C1] dark:border-emerald-600 ring-2 ring-[#008F6C]/20 shadow-xs' 
                   : isCompleted 
                   ? 'bg-[#F8FAFC] dark:bg-slate-800/70 border-[#D0D5DD] dark:border-slate-700 shadow-xs' 
+                  : isReady
+                  ? 'bg-emerald-50/30 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-800/60 shadow-xs'
                   : 'bg-white dark:bg-slate-900/60 border-[#E4E7EC] dark:border-slate-800/80'
               }`}
             >
@@ -112,6 +129,8 @@ export default function PipelineTracker({
                       ? 'bg-[#008F6C] text-white shadow-xs' 
                       : isCompleted 
                       ? 'bg-[#DDF7EE] dark:bg-emerald-900/70 text-[#087F5B] dark:text-emerald-300 border border-[#8ED8C1] dark:border-transparent' 
+                      : isReady
+                      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700'
                       : 'bg-slate-100 dark:bg-slate-800 text-[#667085] dark:text-slate-400'
                   }`}>
                     {isFailed ? (
@@ -132,9 +151,11 @@ export default function PipelineTracker({
                       ? 'bg-[#E8F7F2] dark:bg-emerald-900/80 text-[#006B52] dark:text-emerald-200 border-[#8ED8C1] dark:border-emerald-700 animate-pulse font-extrabold' 
                       : isCompleted 
                       ? 'bg-[#DDF7EE] dark:bg-emerald-950/70 text-[#087F5B] dark:text-emerald-300 border-[#8ED8C1] dark:border-emerald-800' 
+                      : isReady
+                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700'
                       : 'bg-[#EEF2F6] dark:bg-slate-800 text-[#475467] dark:text-slate-400 border-[#D0D5DD] dark:border-slate-700'
                   }`}>
-                    {isFailed ? 'FAILED' : isCurrent ? 'PROCESSING' : isCompleted ? 'COMPLETED' : 'PENDING'}
+                    {statusText}
                   </span>
                 </div>
 

@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, UploadFile, File, Header, HTTPException, Form, Depends
+from fastapi import FastAPI, UploadFile, File, Header, HTTPException, Form, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pypdf import PdfReader
@@ -23,6 +23,7 @@ from backend.database import init_db, get_db, Tender, Bid, Deduction, AuditLog, 
 from backend.services.document_ingestion import ingest_document
 from backend.services.bid_extractor import extract_bid_dossier
 from backend.services.text_normalizer import normalize_text
+from backend.services.pdf_report_generator import generate_bid_compliance_pdf
 from backend.ml.ml_adapter import evaluate_bid_ml_compliance
 
 @asynccontextmanager
@@ -96,12 +97,16 @@ def parse_bid_pdf(file_bytes):
         "gstin": dossier["gstin"],
         "udyam": dossier["udyam"],
         "epfo": dossier["epfo"],
+        "esic": dossier.get("esic"),
+        "bank": dossier.get("bank", {"bank_name": None, "account_number": None, "ifsc": None}),
         "local_content": dossier["local_content_percent"],
         "local_content_percent": dossier["local_content_percent"],
         "extraction_method": ingestion["extraction_method"],
         "page_count": ingestion["page_count"],
         "confidence": ingestion["confidence"],
         "turnover": dossier["turnover"],
+        "experience": dossier.get("experience"),
+        "category": dossier.get("category"),
         "oem": {
             "oem_name": dossier["oem_name"],
             "oem_authorization_valid_until": dossier["oem_authorization_valid_until"]
@@ -244,11 +249,21 @@ def format_bid_payload(bid: Bid) -> dict:
         "ml_prediction": ml_prediction,
         "ml_status": getattr(bid, "ml_status", "available") or "available",
         "feature_provenance": provenance_dict,
+        "esic": getattr(bid, "esic", None),
+        "bank": {
+            "bank_name": getattr(bid, "bank_name", None),
+            "account_number": getattr(bid, "account_number", None),
+            "ifsc": getattr(bid, "ifsc", None)
+        },
         "extracted_data": {
             "pan": bid.pan,
             "gstin": bid.gstin,
             "udyam": bid.udyam,
             "epfo": bid.epfo,
+            "esic": getattr(bid, "esic", None),
+            "bank_name": getattr(bid, "bank_name", None),
+            "account_number": getattr(bid, "account_number", None),
+            "ifsc": getattr(bid, "ifsc", None),
             "local_content_percent": bid.local_content_percent
         },
         "extractedJson": {
@@ -256,6 +271,10 @@ def format_bid_payload(bid: Bid) -> dict:
             "gstin": bid.gstin,
             "udyam": bid.udyam,
             "epfo": bid.epfo,
+            "esic": getattr(bid, "esic", None),
+            "bank_name": getattr(bid, "bank_name", None),
+            "account_number": getattr(bid, "account_number", None),
+            "ifsc": getattr(bid, "ifsc", None),
             "local_content_percent": bid.local_content_percent
         },
         "evidence": evidence_dict,
@@ -322,6 +341,41 @@ async def get_bid_detail(bid_id: str, db: Session = Depends(get_db)):
     return payload
 
 
+@app.get("/api/bids/{bid_id}/report.pdf")
+async def get_bid_compliance_pdf(bid_id: str, db: Session = Depends(get_db)):
+    """
+    DYNAMIC REPORTLAB PDF COMPLIANCE CERTIFICATE:
+    Generates a downloadable PDF compliance certificate from the actual stored verification
+    results in SQLite, including extracted dossier evidence, deterministic rules, and ML scoring.
+    """
+    bid = db.query(Bid).filter(Bid.bid_id == bid_id).first()
+    if not bid:
+        raise HTTPException(status_code=404, detail=f"Bid '{bid_id}' not found")
+
+    tender = db.query(Tender).filter(Tender.tender_id == bid.tender_id).first()
+    tender_dict = {
+        "tender_id": tender.tender_id if tender else bid.tender_id,
+        "title": tender.title if tender else "Supply, Configuration & 3-Yr Support of 500 Enterprise Laptops",
+        "organization": tender.organization if tender else "MeitY"
+    }
+
+    bid_payload = format_bid_payload(bid)
+    try:
+        pdf_bytes = generate_bid_compliance_pdf(bid_payload, tender_dict)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate compliance PDF: {str(e)}")
+
+    filename = f"BidWise_Compliance_{bid_id}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}",
+            "Content-Type": "application/pdf"
+        }
+    )
+
+
 @app.post("/api/bids/submit")
 async def submit_bid(
     company_name: str = Form(...),
@@ -362,7 +416,83 @@ async def submit_bid(
     )
     ml_pred = ml_eval.get("ml_prediction") or {}
 
-    # 1. Create Bid record
+    # Composite duplicate protection: check for existing bid under this tender by PAN or normalized company name
+    pan_val = data.get("pan")
+    has_pan = bool(pan_val and pan_val.strip().upper() not in ["", "N/A", "NONE", "NULL"])
+
+    existing_bid = None
+    if has_pan:
+        existing_bid = db.query(Bid).filter(
+            Bid.tender_id == tender_id,
+            Bid.pan == pan_val.strip().upper()
+        ).first()
+
+    if not existing_bid:
+        existing_bid = db.query(Bid).filter(
+            Bid.tender_id == tender_id,
+            Bid.bidder_name.ilike(company_name.strip())
+        ).first()
+
+    if existing_bid:
+        # Update existing record in-place (no duplicate INSERT)
+        bid = existing_bid
+        bid_id = bid.bid_id
+        bid.bidder_name = company_name
+        bid.legal_name = company_name
+        bid.quote_amount = quoted_price
+        bid.compliance_score = score
+        bid.status = status
+        bid.risk_level = risk_level
+        bid.pan = data["pan"]
+        bid.gstin = data["gstin"]
+        bid.udyam = data["udyam"]
+        bid.epfo = data["epfo"]
+        bid.esic = data.get("esic")
+        bid.bank_name = data.get("bank", {}).get("bank_name") if isinstance(data.get("bank"), dict) else None
+        bid.account_number = data.get("bank", {}).get("account_number") if isinstance(data.get("bank"), dict) else None
+        bid.ifsc = data.get("bank", {}).get("ifsc") if isinstance(data.get("bank"), dict) else None
+        bid.local_content_percent = data["local_content_percent"]
+        bid.submitted_at = now_iso
+        bid.document_name = file.filename
+        bid.extraction_method = data.get("extraction_method", "pdf_text")
+        bid.page_count = data.get("page_count", 1)
+        bid.evidence_json = json.dumps(data.get("evidence", {}))
+        bid.ml_predicted_label = ml_pred.get("predicted_compliance_label")
+        bid.ml_confidence = ml_pred.get("confidence")
+        bid.ml_risk_score = ml_pred.get("compliance_risk_score")
+        bid.ml_risk_level = ml_pred.get("risk_level")
+        bid.ml_probabilities_json = json.dumps(ml_pred.get("probabilities", {})) if ml_pred else None
+        bid.ml_model_breakdown_json = json.dumps(ml_pred.get("individual_model_probabilities", {})) if ml_pred else None
+        bid.ml_feature_provenance_json = json.dumps(ml_eval.get("feature_provenance", {}))
+        bid.ml_status = ml_eval.get("ml_status", "available")
+
+        # Replace deduction records
+        db.query(Deduction).filter(Deduction.bid_id == bid_id).delete()
+        for d in deductions:
+            deduction = Deduction(
+                bid_id=bid_id,
+                category=d["category"],
+                reason=d["reason"],
+                score=d["score"]
+            )
+            db.add(deduction)
+
+        # Append audit log
+        audit = AuditLog(
+            bid_id=bid_id,
+            action="AI Verification / Updated Dossier",
+            old_status=None,
+            new_status=status,
+            officer_remark=f"Technical bid dossier re-evaluated via {data.get('extraction_method', 'pdf_text')} ({data.get('page_count', 1)} page(s)). ML Assessment: {ml_pred.get('predicted_compliance_label', 'Evaluated')} (Risk Score: {ml_pred.get('compliance_risk_score', 'N/A')}).",
+            timestamp=now_iso
+        )
+        db.add(audit)
+        db.commit()
+        db.refresh(bid)
+        return format_bid_payload(bid)
+
+    # 1. Create new Bid record if non-existent
+    bid_id = f"BID-{int(time.time() * 1000) % 100000:05d}"
     bid = Bid(
         bid_id=bid_id,
         tender_id=tender_id,
@@ -376,6 +506,10 @@ async def submit_bid(
         gstin=data["gstin"],
         udyam=data["udyam"],
         epfo=data["epfo"],
+        esic=data.get("esic"),
+        bank_name=data.get("bank", {}).get("bank_name") if isinstance(data.get("bank"), dict) else None,
+        account_number=data.get("bank", {}).get("account_number") if isinstance(data.get("bank"), dict) else None,
+        ifsc=data.get("bank", {}).get("ifsc") if isinstance(data.get("bank"), dict) else None,
         local_content_percent=data["local_content_percent"],
         submitted_at=now_iso,
         document_name=file.filename,
@@ -454,11 +588,17 @@ async def verify_bid(file: UploadFile = File(...), authorization: str | None = H
         "extraction_method": data.get("extraction_method", "pdf_text"),
         "page_count": data.get("page_count", 1),
         "confidence": data.get("confidence", 0.95),
+        "esic": data.get("esic"),
+        "bank": data.get("bank", {}),
         "extracted_data": {
             "pan": data["pan"],
             "gstin": data["gstin"],
             "udyam": data["udyam"],
             "epfo": data["epfo"],
+            "esic": data.get("esic"),
+            "bank_name": (data.get("bank") or {}).get("bank_name"),
+            "account_number": (data.get("bank") or {}).get("account_number"),
+            "ifsc": (data.get("bank") or {}).get("ifsc"),
             "local_content_percent": data["local_content_percent"]
         },
         "deductions": deductions,

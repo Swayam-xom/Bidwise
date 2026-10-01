@@ -55,15 +55,18 @@ export default function Topbar({
           GeM
         </div>
         <div className="bidwise-topbar-tender-copy">
-          <div className="bidwise-topbar-eyebrow">
+          <div className="bidwise-topbar-eyebrow flex items-center flex-wrap gap-1.5">
             <span className="bidwise-gem-badge">GeM Tender</span>
             <span className="text-slate-400 dark:text-slate-500">•</span>
             <span className="font-mono text-slate-600 dark:text-slate-300 font-bold">
               Tender ID: {tenderId}
             </span>
             <span className="hidden sm:inline-block text-slate-400 dark:text-slate-500">•</span>
-            <span className="hidden sm:inline-block font-semibold text-emerald-700 dark:text-emerald-400">
-              Technical Bid Compliance Evaluation
+            <span className="hidden md:inline-block px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 text-[10px] font-semibold border border-blue-200 dark:border-blue-800">
+              India-wide Procurement Compliance Platform
+            </span>
+            <span className="hidden lg:inline-block px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 text-[10px] font-semibold border border-purple-200 dark:border-purple-800">
+              MPOnline Hackathon 2026
             </span>
           </div>
 

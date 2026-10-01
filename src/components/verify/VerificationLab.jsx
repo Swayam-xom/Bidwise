@@ -16,7 +16,8 @@ import {
   AlertCircle,
   FileCheck,
   RefreshCw,
-  Lock
+  Lock,
+  FileDown
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PRESET_VERIFICATION_CASES } from '../../data/mockData';
@@ -35,7 +36,7 @@ export default function VerificationLab({
   const [selectedCaseKey, setSelectedCaseKey] = useState(null);
   const [customVerifiedCase, setCustomVerifiedCase] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [failedStep, setFailedStep] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
@@ -101,8 +102,10 @@ export default function VerificationLab({
     setSelectedFile(file);
     setFormError('');
     setPersistedBidId(null);
+    setCustomVerifiedCase(null);
     setIsPresetActive(false);
     setSelectedCaseKey(null);
+    setCurrentStep(1); // Upload Dossier is now selected / ready
 
     // Auto-populate company name if empty
     if (!companyName.trim()) {
@@ -187,6 +190,11 @@ export default function VerificationLab({
         pan: normalized.pan,
         gstin: normalized.gstin,
         udyam: normalized.udyam,
+        epfo: normalized.epfo || extData.epfo,
+        esic: normalized.esic || extData.esic,
+        bankName: normalized.bankName || extData.bank_name || (normalized.bank && normalized.bank.bank_name),
+        accountNumber: normalized.accountNumber || extData.account_number || (normalized.bank && normalized.bank.account_number),
+        ifsc: normalized.ifsc || extData.ifsc || (normalized.bank && normalized.bank.ifsc),
         localContentPct: normalized.localContentPct,
         localContentClass: normalized.localClass,
         turnover: normalized.financialTurnover || "₹18.4 Cr",
@@ -336,6 +344,16 @@ export default function VerificationLab({
     }
   };
 
+  const handleDownloadComplianceCertificate = (targetBidId) => {
+    const bidId = targetBidId || persistedBidId || activeCase?.persistedBidId || activeCase?.rawJson?.bid_id || activeCase?.rawJson?.id;
+    if (!bidId) {
+      setFormError("Compliance Certificate is available after submitting and persisting a bid dossier.");
+      return;
+    }
+    const reportUrl = `${API_BASE_URL}/api/bids/${bidId}/report.pdf`;
+    window.open(reportUrl, '_blank');
+  };
+
   const handleResetVerification = () => {
     setSelectedFile(null);
     setCompanyName('');
@@ -346,6 +364,9 @@ export default function VerificationLab({
     setSelectedCaseKey(null);
     setIsPresetActive(false);
     setStatusMessage('');
+    setCurrentStep(0);
+    setIsAnalyzing(false);
+    setFailedStep(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -412,8 +433,19 @@ export default function VerificationLab({
 
             <button
               type="button"
+              onClick={() => {
+                handleDownloadComplianceCertificate();
+              }}
+              className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-600 dark:border-emerald-500 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-5 py-2.5 font-bold text-xs transition-colors"
+            >
+              <FileDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Download Compliance Certificate (PDF)</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setShowQualifiedPopup(false)}
-              className="mt-6 w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 px-5 py-2.5 font-bold text-xs text-white transition-colors"
+              className="mt-2 w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 px-5 py-2.5 font-bold text-xs text-white transition-colors"
             >
               Continue to Evaluation Workspace
             </button>
@@ -653,17 +685,31 @@ export default function VerificationLab({
               )}
 
               {persistedBidId && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleResetVerification();
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 text-white font-bold text-xs transition-all"
-                >
-                  <RefreshCw className="w-4 h-4 text-emerald-400" />
-                  <span>Verify New Dossier</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownloadComplianceCertificate(persistedBidId);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all active:scale-95"
+                  >
+                    <FileDown className="w-4 h-4" />
+                    <span>Download Compliance Certificate</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleResetVerification();
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 text-white font-bold text-xs transition-all"
+                  >
+                    <RefreshCw className="w-4 h-4 text-emerald-400" />
+                    <span>Verify New Dossier</span>
+                  </button>
+                </>
               )}
             </div>
 
@@ -723,6 +769,11 @@ export default function VerificationLab({
               pan: activeCase.pan,
               gstin: activeCase.gstin,
               udyam: activeCase.udyam,
+              epfo: activeCase.epfo || activeCase.rawJson?.extracted_data?.epfo || activeCase.rawJson?.epfo,
+              esic: activeCase.esic || activeCase.rawJson?.extracted_data?.esic || activeCase.rawJson?.esic,
+              bankName: activeCase.bankName || activeCase.rawJson?.extracted_data?.bank_name || activeCase.rawJson?.bank?.bank_name,
+              accountNumber: activeCase.accountNumber || activeCase.rawJson?.extracted_data?.account_number || activeCase.rawJson?.bank?.account_number,
+              ifsc: activeCase.ifsc || activeCase.rawJson?.extracted_data?.ifsc || activeCase.rawJson?.bank?.ifsc,
               localContentPct: activeCase.localContentPct,
               localContentClass: activeCase.localContentClass,
             } : null}
